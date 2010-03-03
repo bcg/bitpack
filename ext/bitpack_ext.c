@@ -64,7 +64,7 @@ static VALUE bp_from_bytes(VALUE class, VALUE bytes_str)
 
     str = StringValue(bytes_str);
 
-    bp = bitpack_init_from_bytes((unsigned char *)RSTRING(str)->ptr, RSTRING(str)->len);
+    bp = bitpack_init_from_bytes((unsigned char *)RSTRING_PTR(str), RSTRING_LEN(str));
 
     if (bp == NULL) {
         rb_raise(bp_exceptions[BITPACK_ERR_MALLOC_FAILED], "malloc() failed");
@@ -188,7 +188,7 @@ static VALUE bp_on(VALUE self, VALUE index)
 
     if (!bitpack_on(bp, NUM2ULONG(index))) {
         rb_raise(bp_exceptions[bitpack_get_error(bp)],
-                bitpack_get_error_str(bp));
+                "%s", bitpack_get_error_str(bp));
     }
 
     return self;
@@ -210,7 +210,7 @@ static VALUE bp_off(VALUE self, VALUE index)
 
     if (!bitpack_off(bp, NUM2ULONG(index))) {
         rb_raise(bp_exceptions[bitpack_get_error(bp)],
-                bitpack_get_error_str(bp));
+                "%s", bitpack_get_error_str(bp));
     }
 
     return self;
@@ -231,7 +231,7 @@ static VALUE bp_get(VALUE self, VALUE index)
 
     if (!bitpack_get(bp, NUM2ULONG(index), &bit)) {
         rb_raise(bp_exceptions[bitpack_get_error(bp)],
-                bitpack_get_error_str(bp));
+                "%s", bitpack_get_error_str(bp));
     }
 
     return INT2FIX(bit);
@@ -266,7 +266,7 @@ static VALUE bp_set_bits(VALUE self, VALUE value, VALUE num_bits, VALUE index)
 
     if (!bitpack_set_bits(bp, NUM2ULONG(value), NUM2ULONG(num_bits), NUM2ULONG(index))) {
         rb_raise(bp_exceptions[bitpack_get_error(bp)],
-                bitpack_get_error_str(bp));
+                "%s", bitpack_get_error_str(bp));
     }
 
     return self;
@@ -303,10 +303,10 @@ static VALUE bp_set_bytes(VALUE self, VALUE bytes, VALUE index)
 
     str = StringValue(bytes);
 
-    if (!bitpack_set_bytes(bp, (unsigned char *)RSTRING(str)->ptr,
-          RSTRING(str)->len, NUM2ULONG(index))) {
+    if (!bitpack_set_bytes(bp, (unsigned char *)RSTRING_PTR(str),
+          RSTRING_LEN(str), NUM2ULONG(index))) {
         rb_raise(bp_exceptions[bitpack_get_error(bp)],
-                bitpack_get_error_str(bp));
+                "%s", bitpack_get_error_str(bp));
     }
 
     return self;
@@ -351,7 +351,7 @@ static VALUE bp_get_bits(VALUE self, VALUE num_bits, VALUE index)
 
     if (!bitpack_get_bits(bp, NUM2ULONG(num_bits), NUM2ULONG(index), &value)) {
         rb_raise(bp_exceptions[bitpack_get_error(bp)],
-                bitpack_get_error_str(bp));
+                "%s", bitpack_get_error_str(bp));
     }
 
     return ULONG2NUM(value);
@@ -383,7 +383,7 @@ static VALUE bp_get_bytes(VALUE self, VALUE num_bytes, VALUE index)
 
     if (!bitpack_get_bytes(bp, NUM2ULONG(num_bytes), NUM2ULONG(index), &bytes)) {
         rb_raise(bp_exceptions[bitpack_get_error(bp)],
-                bitpack_get_error_str(bp));
+                "%s", bitpack_get_error_str(bp));
     }
 
     str = rb_str_new((char *)bytes, NUM2ULONG(num_bytes));
@@ -421,7 +421,7 @@ static VALUE bp_append_bits(VALUE self, VALUE value, VALUE num_bits)
 
     if (!bitpack_append_bits(bp, NUM2ULONG(value), NUM2ULONG(num_bits))) {
         rb_raise(bp_exceptions[bitpack_get_error(bp)],
-                bitpack_get_error_str(bp));
+                "%s", bitpack_get_error_str(bp));
     }
 
     return self;
@@ -463,10 +463,10 @@ static VALUE bp_append_bytes(VALUE self, VALUE value)
 
     str = StringValue(value);
 
-    if (!bitpack_append_bytes(bp, (unsigned char *)RSTRING(str)->ptr,
-          RSTRING(str)->len)) {
+    if (!bitpack_append_bytes(bp, (unsigned char *)RSTRING_PTR(str),
+          RSTRING_LEN(str))) {
         rb_raise(bp_exceptions[bitpack_get_error(bp)],
-                bitpack_get_error_str(bp));
+                "%s", bitpack_get_error_str(bp));
     }
 
     return self;
@@ -502,7 +502,7 @@ static VALUE bp_read_bits(VALUE self, VALUE num_bits)
 
     if (!bitpack_read_bits(bp, NUM2ULONG(num_bits), &value)) {
         rb_raise(bp_exceptions[bitpack_get_error(bp)],
-                bitpack_get_error_str(bp));
+                "%s", bitpack_get_error_str(bp));
     }
 
     return ULONG2NUM(value);
@@ -537,7 +537,7 @@ static VALUE bp_read_bytes(VALUE self, VALUE num_bytes)
 
     if (!bitpack_read_bytes(bp, NUM2ULONG(num_bytes), &value)) {
         rb_raise(bp_exceptions[bitpack_get_error(bp)],
-                bitpack_get_error_str(bp));
+                "%s", bitpack_get_error_str(bp));
     }
 
     str = rb_str_new((char *)value, NUM2ULONG(num_bytes));
@@ -563,7 +563,7 @@ static VALUE bp_to_bin(VALUE self)
 
     if (!bitpack_to_bin(bp, &s)) {
         rb_raise(bp_exceptions[bitpack_get_error(bp)],
-                bitpack_get_error_str(bp));
+                "%s", bitpack_get_error_str(bp));
     }
 
     str = rb_str_new2(s);
@@ -608,7 +608,7 @@ static VALUE bp_to_bytes(VALUE self)
 
     if (!bitpack_to_bytes(bp, &s, &num_bytes)) {
         rb_raise(bp_exceptions[bitpack_get_error(bp)],
-                bitpack_get_error_str(bp));
+                "%s", bitpack_get_error_str(bp));
     }
 
     str = rb_str_new((char *)s, num_bytes);
