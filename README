@@ -1,0 +1,101 @@
+= BitPack: Library for packing and unpacking binary strings
+
+BitPack is a library that provides an easy to use API for packing and
+unpacking arbitrary binary strings.  Unlike Array#pack and String#unpack,
+BitPack objects allow you to pack and unpack fields of arbitrary bit lengths.
+
+= Installing BitPack
+
+Get BitPack from RubyForge.
+
+  $ gem install bitpack
+
+= Example
+
+In this example, we will see how to pack and unpack a contrived message format.
+
+The format is as follows:
+
+* field +foo+: unsigned integer, 3 bits in length
+* field +bar+: unsigned integer, 13 bits in length
+* field +baz+: octet string, +bar+ bytes in length
+
+
+   require 'rubygems'
+   require 'bitpack'
+   
+   class Message
+     attr_accessor :foo, :bar, :baz
+     def initialize(foo=nil, bar=nil, baz=nil)
+       @foo = foo
+       @bar = bar
+       @baz = baz
+     end
+   
+     def pack
+       # create a new BitPack object to pack the message into
+       bp = BitPack.new
+   
+       # pack field foo into 3 bits
+       bp.append_bits(@foo, 3)
+   
+       # pack field bar into 13 bits
+       bp.append_bits(@bar, 13)
+   
+       # finally, pack baz as a string
+       bp.append_bytes(@baz)
+   
+       # convert the BitPack to a string
+       bp.to_bytes
+     end
+   
+     def self.unpack(bytes)
+       m = self.new
+   
+       # create a new BitPack from the packed message string
+       bp = BitPack.from_bytes(bytes)
+   
+       # unpack field foo from the first 3 bits
+       m.foo = bp.read_bits(3)
+   
+       # unpack field bar from the next 13 bits
+       m.bar = bp.read_bits(13)
+   
+       # finally, unpack the string baz from the next bar bytes 
+       m.baz = bp.read_bytes(m.bar)
+   
+       m
+     end
+   end
+   
+   m1 = Message.new
+   m1.foo = 5
+   s = "BitPack makes packing and unpacking binary strings easy!"
+   m1.bar = s.length
+   m1.baz = s
+   
+   bytes = m1.pack
+   
+   p bytes
+     #=> "\2408BitPack makes packing and unpacking binary strings easy!"
+   
+   m2 = Message.unpack(bytes)
+   p m2.foo
+     #=> 5
+   p m2.bar
+     #=> 56
+   p m2.baz
+     #=> "BitPack makes packing and unpacking binary strings easy!"
+
+
+= Notes
+
+BitPack is almost entirely implemented as a C library.  If you would like to
+use BitPack from a C program, just grab the <tt>bitpack.c</tt> and <tt>bitpack.h</tt> files from
+the <tt>ext/</tt> directory of the gem and include them in your project.  Documentation
+can be found in <tt>bitpack.h</tt> and example usage can be seen in <tt>test/bitpack_tests.c</tt>.
+
+= Project Page
+
+http://rubyforge.org/projects/bitpack
+
