@@ -1,6 +1,5 @@
 
 require 'rubygems'
-Gem::manage_gems
 require 'rake/gempackagetask'
 require 'rake/clean'
 require 'rake/rdoctask'
@@ -87,11 +86,11 @@ end
 task :package => [ :gem, :tgz ]
 
 task :install => :gem do
-  sh %{sudo gem install pkg/#{GEM_NAME}}
+  sh %{gem install pkg/#{GEM_NAME}}
 end
 
 task :uninstall do
-  sh %{sudo gem uninstall #{NAME}}
+  sh %{gem uninstall #{NAME}}
 end
 
 task :www => :rdoc do
